@@ -1,103 +1,124 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect, useRef } from 'react';
+import { sampleTracks } from '@/lib/sample-tracks';
+import { PlayerControls } from './PlayerControls';
+import { TrackInfo } from './TrackInfo';
+import { VolumeControl } from './VolumeControl';
+import { ProgressBar } from './ProgressBar';
 
-const Player = () => {
+export default function Player() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
-
-  // Simulated current track data
-  const currentTrack = {
-    title: "Sample Track",
-    artist: "Sample Artist",
-    albumArt: "https://via.placeholder.com/50"
-  };
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentTrack = sampleTracks[currentTrackIndex];
 
   useEffect(() => {
-    // Simulated audio player
-    const interval = setInterval(() => {
-      if (isPlaying) {
-        setCurrentTime((prevTime) => {
-          if (prevTime >= duration) {
-            setIsPlaying(false);
-            return 0;
-          }
-          return prevTime + 1;
-        });
-      }
-    }, 1000);
+    const audio = new Audio();
+    audio.src = currentTrack.audioUrl;
+    audioRef.current = audio;
 
-    return () => clearInterval(interval);
-  }, [isPlaying, duration]);
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      handleNext();
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+      audio.pause();
+      audio.src = '';
+    };
+  }, [currentTrackIndex]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(error => {
+          console.error('Error playing audio:', error);
+        });
+      }
+      setIsPlaying(!isPlaying);
+    }
   };
 
   const handleSeek = (newValue: number[]) => {
-    setCurrentTime(newValue[0]);
+    if (audioRef.current) {
+      const newTime = newValue[0];
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
   };
 
   const handleVolumeChange = (newValue: number[]) => {
-    setVolume(newValue[0]);
+    const newVolume = newValue[0];
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
   };
 
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  const handlePrevious = () => {
+    const newIndex = (currentTrackIndex - 1 + sampleTracks.length) % sampleTracks.length;
+    setCurrentTrackIndex(newIndex);
+    setIsPlaying(false);
+  };
+
+  const handleNext = () => {
+    const newIndex = (currentTrackIndex + 1) % sampleTracks.length;
+    setCurrentTrackIndex(newIndex);
+    setIsPlaying(false);
   };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-sm border-t border-border p-4 flex items-center justify-between">
-      <div className="flex items-center space-x-4">
-        <img src={currentTrack.albumArt} alt="Album Art" className="w-12 h-12 rounded" />
-        <div>
-          <p className="font-semibold text-primary">{currentTrack.title}</p>
-          <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-        </div>
-      </div>
+      <TrackInfo
+        title={currentTrack.title}
+        artist={currentTrack.artist}
+        albumArt={currentTrack.albumArt}
+      />
       <div className="flex flex-col items-center space-y-2 flex-1 max-w-xl">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon">
-            <SkipBack className="h-5 w-5 text-primary" />
-          </Button>
-          <Button onClick={togglePlayPause} variant="outline" size="icon" className="text-primary">
-            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-          </Button>
-          <Button variant="ghost" size="icon">
-            <SkipForward className="h-5 w-5 text-primary" />
-          </Button>
-        </div>
-        <div className="w-full flex items-center space-x-2">
-          <span className="text-sm text-muted-foreground">{formatTime(currentTime)}</span>
-          <Slider
-            value={[currentTime]}
-            max={duration}
-            step={1}
-            onValueChange={handleSeek}
-            className="flex-1"
-          />
-          <span className="text-sm text-muted-foreground">{formatTime(duration)}</span>
-        </div>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Volume2 className="h-5 w-5 text-primary" />
-        <Slider
-          value={[volume]}
-          max={1}
-          step={0.01}
-          onValueChange={handleVolumeChange}
-          className="w-24"
+        <PlayerControls
+          isPlaying={isPlaying}
+          onPlayPause={togglePlayPause}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+        />
+        <ProgressBar
+          currentTime={currentTime}
+          duration={duration}
+          onSeek={handleSeek}
         />
       </div>
+      <VolumeControl
+        volume={volume}
+        onVolumeChange={handleVolumeChange}
+      />
     </div>
   );
-};
-
-export default Player;
+}
