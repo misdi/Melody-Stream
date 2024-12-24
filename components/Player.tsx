@@ -24,6 +24,13 @@ export default function Player() {
 
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
+      // Auto-play when track changes if it was already playing
+      if (isPlaying) {
+        audio.play().catch(error => {
+          console.error('Error auto-playing audio:', error);
+          setIsPlaying(false);
+        });
+      }
     };
 
     const handleTimeUpdate = () => {
@@ -31,7 +38,6 @@ export default function Player() {
     };
 
     const handleEnded = () => {
-      setIsPlaying(false);
       handleNext();
     };
 
@@ -46,7 +52,7 @@ export default function Player() {
       audio.pause();
       audio.src = '';
     };
-  }, [currentTrackIndex]);
+  }, [currentTrackIndex, isPlaying]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -86,13 +92,11 @@ export default function Player() {
   const handlePrevious = () => {
     const newIndex = (currentTrackIndex - 1 + sampleTracks.length) % sampleTracks.length;
     setCurrentTrackIndex(newIndex);
-    setIsPlaying(false);
   };
 
   const handleNext = () => {
     const newIndex = (currentTrackIndex + 1) % sampleTracks.length;
     setCurrentTrackIndex(newIndex);
-    setIsPlaying(false);
   };
 
   return (
