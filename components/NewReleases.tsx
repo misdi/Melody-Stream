@@ -4,7 +4,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 const newReleases = [
   {
     name: "Midnights",
-    artist: "Taylor Swift Test",
+    artist: "Taylor Swift",
     coverUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8bXVzaWN8ZW58MHx8MHx8fDA%3D"
   },
   {
@@ -34,10 +34,10 @@ export default function NewReleases() {
     <ScrollArea className="w-full whitespace-nowrap rounded-md border">
       <div className="flex w-max space-x-4 p-4">
         {newReleases.map((album) => (
-          <Card key={album.name} className="w-[200px]">
-            <CardHeader>
-              <CardTitle className="truncate">{album.name}</CardTitle>
-              <CardDescription>{album.artist}</CardDescription>
+          <Card key={album.name} className="w-[160px] md:w-[200px]">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-base md:text-lg line-clamp-1">{album.name}</CardTitle>
+              <CardDescription className="text-xs md:text-sm">{album.artist}</CardDescription>
             </CardHeader>
             <CardContent>
               <img

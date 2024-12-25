@@ -31,7 +31,7 @@ export default function RootLayout({
           <AuthProvider>
             <div className="flex h-screen">
               <Sidebar />
-              <main className="flex-1 overflow-y-auto">
+              <main className="flex-1 overflow-y-auto pt-16 md:pt-0 pb-32">
                 {children}
               </main>
             </div>

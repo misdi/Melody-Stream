@@ -34,10 +34,10 @@ export default function FeaturedPlaylists() {
     <ScrollArea className="w-full whitespace-nowrap rounded-md border">
       <div className="flex w-max space-x-4 p-4">
         {playlists.map((playlist) => (
-          <Card key={playlist.name} className="w-[250px]">
-            <CardHeader>
-              <CardTitle>{playlist.name}</CardTitle>
-              <CardDescription>{playlist.description}</CardDescription>
+          <Card key={playlist.name} className="w-[200px] md:w-[250px]">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-base md:text-lg line-clamp-1">{playlist.name}</CardTitle>
+              <CardDescription className="text-xs md:text-sm line-clamp-2">{playlist.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <img

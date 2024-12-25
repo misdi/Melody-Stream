@@ -16,8 +16,10 @@ export function ProgressBar({ currentTime, duration, onSeek }: ProgressBarProps)
   };
 
   return (
-    <div className="w-full flex items-center space-x-2">
-      <span className="text-sm text-muted-foreground">{formatTime(currentTime)}</span>
+    <div className="w-full flex items-center space-x-2 px-2">
+      <span className="text-xs md:text-sm text-muted-foreground w-12 text-right">
+        {formatTime(currentTime)}
+      </span>
       <Slider
         value={[currentTime]}
         max={duration}
@@ -25,7 +27,9 @@ export function ProgressBar({ currentTime, duration, onSeek }: ProgressBarProps)
         onValueChange={onSeek}
         className="flex-1"
       />
-      <span className="text-sm text-muted-foreground">{formatTime(duration)}</span>
+      <span className="text-xs md:text-sm text-muted-foreground w-12">
+        {formatTime(duration)}
+      </span>
     </div>
   );
 }
