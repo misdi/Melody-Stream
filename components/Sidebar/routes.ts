@@ -7,7 +7,7 @@ export const navigationRoutes = [
 ];
 
 export const playlists = [
-  { name: 'Chill Vibes', href: '/playlist/chill-vibes' },
-  { name: 'Workout Mix', href: '/playlist/workout-mix' },
-  { name: 'Study Session', href: '/playlist/study-session' },
+  { name: 'Chill Vibes', href: '/playlist/1' },
+  { name: 'Workout Mix', href: '/playlist/2' },
+  { name: 'Study Session', href: '/playlist/3' },
 ];

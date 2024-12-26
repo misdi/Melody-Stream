@@ -1,8 +1,10 @@
 "use client"
 
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Image from "next/image"
+import { getItemLink } from '@/lib/navigation'
 
 interface LibraryItem {
   id: number;
@@ -25,27 +27,33 @@ export function LibraryGrid({ items, type }: LibraryGridProps) {
     <ScrollArea className="h-[calc(100vh-250px)]">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
         {items.map((item) => (
-          <Card key={item.id} className="group hover:bg-accent transition-colors">
-            <CardHeader className="space-y-4">
-              <div className="aspect-square relative overflow-hidden rounded-md">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.name}
-                  fill
-                  className="object-cover transition-transform group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-              <div className="space-y-1">
-                <CardTitle className="text-base line-clamp-1">{item.name}</CardTitle>
-                <CardDescription className="line-clamp-2">
-                  {type === 'playlist' && `${item.songCount} songs`}
-                  {type === 'album' && `${item.artist} • ${item.year}`}
-                  {type === 'artist' && `${item.followers} followers`}
-                </CardDescription>
-              </div>
-            </CardHeader>
-          </Card>
+          <Link 
+            key={item.id} 
+            href={getItemLink(type, item.id)}
+            className="block"
+          >
+            <Card className="group hover:bg-accent transition-colors">
+              <CardHeader className="space-y-4">
+                <div className="aspect-square relative overflow-hidden rounded-md">
+                  <Image
+                    src={item.imageUrl}
+                    alt={`Cover art for ${item.name}${item.artist ? ` by ${item.artist}` : ''}`}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <CardTitle className="text-base line-clamp-1">{item.name}</CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {type === 'playlist' && `${item.songCount} songs`}
+                    {type === 'album' && `${item.artist} • ${item.year}`}
+                    {type === 'artist' && `${item.followers} followers`}
+                  </CardDescription>
+                </div>
+              </CardHeader>
+            </Card>
+          </Link>
         ))}
       </div>
     </ScrollArea>

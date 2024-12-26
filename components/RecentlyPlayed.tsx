@@ -36,7 +36,10 @@ export default function RecentlyPlayed() {
         {recentlyPlayed.map((track) => (
           <div key={track.name} className="w-[150px] text-center">
             <Avatar className="w-[150px] h-[150px]">
-              <AvatarImage src={track.albumCover} alt={track.name} />
+              <AvatarImage 
+                src={track.albumCover} 
+                alt={`Album artwork for ${track.name} by ${track.artist}`} 
+              />
               <AvatarFallback>{track.name[0]}</AvatarFallback>
             </Avatar>
             <div className="mt-2">
