@@ -1,11 +1,11 @@
 "use client"
 
-import { sampleTracks } from '@/lib/sample-tracks';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { PlayerControls } from './PlayerControls';
-import { TrackInfo } from './TrackInfo';
-import { VolumeControl } from './VolumeControl';
-import { ProgressBar } from './ProgressBar';
+import { sampleTracks } from '@/lib/sample-tracks'
+import { usePlayerControls } from '@/hooks/useAudioPlayer'
+import { PlayerControls } from './PlayerControls'
+import { TrackInfo } from './TrackInfo'
+import { VolumeControl } from './VolumeControl'
+import { ProgressBar } from './ProgressBar'
 
 export default function Player() {
   const {
@@ -19,7 +19,9 @@ export default function Player() {
     handleVolumeChange,
     handlePrevious,
     handleNext
-  } = useAudioPlayer(sampleTracks);
+  } = usePlayerControls(sampleTracks)
+
+  if (!currentTrack) return null
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-sm border-t border-border p-4">
@@ -28,7 +30,7 @@ export default function Player() {
           <TrackInfo
             title={currentTrack.title}
             artist={currentTrack.artist}
-            albumArt={currentTrack.albumArt}
+            albumArt={currentTrack.imageUrl}
           />
           <div className="flex flex-col items-center space-y-2 w-full md:w-auto md:flex-1 md:max-w-xl">
             <PlayerControls
@@ -52,5 +54,5 @@ export default function Player() {
         </div>
       </div>
     </div>
-  );
+  )
 }

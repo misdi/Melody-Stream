@@ -2,6 +2,6 @@ export interface Track {
   id: string;
   title: string;
   artist: string;
-  albumArt: string;
+  imageUrl: string;
   audioUrl: string;
 }

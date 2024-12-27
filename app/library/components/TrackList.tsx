@@ -4,6 +4,8 @@ import { Play, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { formatDuration } from "@/lib/utils"
+import { PlayButton } from "@/components/PlayButton"
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext"
 
 interface Track {
   id: number
@@ -13,6 +15,7 @@ interface Track {
   duration: number
   plays: number
   imageUrl: string
+  audioUrl?: string
 }
 
 interface TrackListProps {
@@ -20,6 +23,8 @@ interface TrackListProps {
 }
 
 export function TrackList({ tracks }: TrackListProps) {
+  const { currentTrack } = useAudioPlayer()
+
   return (
     <div className="space-y-1">
       <div className="grid grid-cols-[auto_1fr_1fr_auto] md:grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 px-4 py-2 text-sm text-muted-foreground font-medium">
@@ -32,15 +37,26 @@ export function TrackList({ tracks }: TrackListProps) {
       {tracks.map((track, index) => (
         <div
           key={track.id}
-          className="grid grid-cols-[auto_1fr_1fr_auto] md:grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 px-4 py-2 text-sm hover:bg-accent group rounded-md"
+          className={`grid grid-cols-[auto_1fr_1fr_auto] md:grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 px-4 py-2 text-sm hover:bg-accent group rounded-md ${
+            currentTrack?.id === track.id.toString() ? 'bg-accent' : ''
+          }`}
         >
-          <div className="w-8 flex items-center justify-center group-hover:hidden">
-            {index + 1}
-          </div>
-          <div className="w-8 items-center justify-center hidden group-hover:flex">
-            <Button size="icon" variant="ghost" className="h-8 w-8">
-              <Play className="h-4 w-4" />
-            </Button>
+          <div className="w-8 flex items-center justify-center">
+            <span className="group-hover:hidden">{index + 1}</span>
+            <div className="hidden group-hover:block">
+              <PlayButton 
+                track={{
+                  ...track,
+                  id: track.id.toString(),
+                  audioUrl: track.audioUrl || 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+                }}
+                playlist={tracks.map(t => ({
+                  ...t,
+                  id: t.id.toString(),
+                  audioUrl: t.audioUrl || 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+                }))}
+              />
+            </div>
           </div>
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-10 h-10 overflow-hidden rounded">
